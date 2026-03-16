@@ -3,76 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مفاجأة 🎃</title>
+    <title>Terminal | System-Check</title>
     <style>
-        body { background-color: #000; color: #fff; text-align: center; font-family: 'Arial', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; overflow: hidden; }
-        
-        /* تصميم الزر */
-        #btn { padding: 20px 40px; font-size: 24px; cursor: pointer; background: #800000; border: 2px solid #ff0000; color: white; border-radius: 50px; box-shadow: 0 0 20px #ff0000; transition: 0.2s; }
-        #btn:active { transform: scale(0.9); }
-
-        /* تأثير الاهتزاز (Animation) */
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
-        }
-
-        /* حاوية الرعب */
-        #scaryContainer {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 1000;
-        }
-
-        /* الصورة المرعبة مع تفعيل الاهتزاز */
-        #scaryImg {
-            width: 100%; height: 100%; object-fit: cover;
-            animation: shake 0.1s infinite; /* اهتزاز سريع جداً */
-        }
-
-        /* وميض أحمر للخلفية */
-        .flash { animation: flash-red 0.1s infinite; }
-        @keyframes flash-red {
-            0%, 100% { background-color: black; }
-            50% { background-color: #400000; }
-        }
+        body { background-color: #050505; color: #00ff41; font-family: 'Courier New', Courier, monospace; margin: 0; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+        #header { padding: 10px; border-bottom: 1px solid #00ff41; background: #000; text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+        #terminal { flex-grow: 1; padding: 20px; overflow-y: auto; font-size: 14px; line-height: 1.5; }
+        .input-area { background: #111; padding: 20px; border-top: 1px solid #00ff41; }
+        input { background: transparent; border: 1px solid #00ff41; color: #00ff41; padding: 10px; width: 70%; outline: none; }
+        button { background: #00ff41; color: black; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
+        .scan-line { color: #00ff41; margin-bottom: 5px; }
+        .warning { color: #ff0000; font-weight: bold; }
+        .success { color: #008cff; }
+        /* أنيميشن الوميض */
+        .cursor { display: inline-block; width: 10px; height: 18px; background: #00ff41; animation: blink 0.8s infinite; vertical-align: middle; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="ui">
-        <h1>هل أنت مستعد للتحدي؟ 👻</h1>
-        <p>اضغط الزر وشاهد ما سيحدث...</p>
-        <button id="btn" onclick="goScary()">ابدأ الآن</button>
-    </div>
+<div id="header">CENTRAL INTELLIGENCE UNIT - VULNERABILITY SCANNER v2.0</div>
 
-    <div id="scaryContainer">
-        <img id="scaryImg" src="https://i.imgur.com/vH9Xv9H.jpg">
-        <audio id="scream" src="https://www.soundboard.com/handler/DownLoadTrack.ashx?cliptitle=Scream&filename=24/248317-062e783c-1b6a-4d33-a0e2-e1a5f9730704.mp3"></audio>
-    </div>
+<div id="terminal">
+    <div class="scan-line">>> System initialization... [OK]</div>
+    <div class="scan-line">>> Connecting to secure server... [ENCRYPTED]</div>
+    <div class="scan-line">>> Waiting for user target input...<span class="cursor"></span></div>
+</div>
 
-    <script>
-        function goScary() {
-            // تشغيل الصوت
-            document.getElementById('scream').play();
-            
-            // إظهار المحتوى وإضافة الوميض
-            document.getElementById('scaryContainer').style.display = 'block';
-            document.body.classList.add('flash');
+<div class="input-area">
+    <input type="text" id="targetInput" placeholder="ادخل رابط الموقع أو الـ IP للفحص...">
+    <button onclick="startFakeScan()">فحص أمني</button>
+</div>
 
-            // محاولة إجبار المتصفح على وضع ملء الشاشة (يحتاج تفاعل مستخدم)
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            }
-        }
-    </script>
+<script>
+    const terminal = document.getElementById('terminal');
+
+    function addLog(text, type = '') {
+        const div = document.createElement('div');
+        div.className = 'scan-line ' + type;
+        div.innerHTML = `>> ${text}`;
+        terminal.appendChild(div);
+        terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function startFakeScan() {
+        const target = document.getElementById('targetInput').value;
+        if (!target) return alert("الرجاء إدخال هدف أولاً!");
+
+        addLog(`إطلاق عملية الفحص على: ${target}...`, 'success');
+        
+        let steps = [
+            "جاري سحب بيانات الـ DNS...",
+            "تحليل المنافذ المفتوحة (Port Scanning)...",
+            "فحص ثغرات SQL Injection المحتملة...",
+            "تحذير: تم اكتشاف جدار حماية قوي!",
+            "محاولة تجاوز الـ Firewall...",
+            "نجاح الاتصال الخلفي (Reverse Shell Initialized)...",
+            "جاري تحميل تقرير الثغرات النهائي..."
+        ];
+
+        steps.forEach((step, index) => {
+            setTimeout(() => {
+                let type = step.includes('تحذير') ? 'warning' : '';
+                addLog(step, type);
+                
+                if (index === steps.length - 1) {
+                    setTimeout(() => {
+                        addLog("اكتمل الفحص! تم العثور على (3) ثغرات متوسطة الخطورة.", "success");
+                    }, 1000);
+                }
+            }, (index + 1) * 1500);
+        });
+    }
+</script>
+
 </body>
 </html>
