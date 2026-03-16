@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S Y S T E M _ O S I N T</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: monospace; padding: 20px; margin: 0; }
+        #log { border: 1px solid #050; padding: 10px; height: 300px; overflow-y: auto; background: #020202; font-size: 13px; }
+        .input-group { margin-top: 15px; display: flex; }
+        input { background: #000; border: 1px solid #0f0; color: #0f0; padding: 10px; flex-grow: 1; outline: none; }
+        button { background: #0f0; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; }
+        .green { color: #0f0; }
+        .blue { color: #00d4ff; }
+        .red { color: #f00; }
+    </style>
+</head>
+<body>
+    <h3>S Y S T E M _ O S I N T</h3>
+    <div id="log">> بانتظار الهدف...</div>
+    <div class="input-group">
+        <input type="text" id="domain" placeholder="أدخل الدومين (مثلاً: google.com)">
+        <button onclick="check()">تحليل</button>
+    </div>
+
+    <script>
+        async function check() {
+            const domain = document.getElementById('domain').value;
+            const log = document.getElementById('log');
+            if(!domain) return;
+
+            log.innerHTML += `<div class="blue">>> جاري فحص سجلات DNS لـ ${domain}...</div>`;
+
+            try {
+                const response = await fetch(`https://cloudflare-dns.com/query?name=${domain}&type=A`, {
+                    headers: { 'accept': 'application/dns-json' }
+                });
+                const data = await response.json();
+
+                if (data.Answer) {
+                    data.Answer.forEach(ans => {
+                        log.innerHTML += `<div class="green">> تم العثور على IP: ${ans.data} (النوع: ${ans.type})</div>`;
+                    });
+                } else {
+                    log.innerHTML += `<div class="red">> لم يتم العثور على سجلات عامة.</div>`;
+                }
+            } catch (e) {
+                log.innerHTML += `<div class="red">> فشل الاتصال بالشبكة الاستخباراتية.</div>`;
+            }
+            log.scrollTop = log.scrollHeight;
+        }
+    </script>
+</body>
+</html>
